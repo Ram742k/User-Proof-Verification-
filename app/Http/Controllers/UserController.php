@@ -12,71 +12,31 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth'); // ✅ Ensures only authenticated users can access this controller
+        $this->middleware('auth');
     }
 
-    // ✅ Fetch paginated user list with filtering & searching
-    // public function index(Request $request)
-    // {
-    //     $query = User::with('profile')
-    //         ->where('role', 'user') // ✅ Only show users
-    //         ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
-    //         ->select('users.*', 'profiles.id_proof', 'profiles.address_proof', 'profiles.status', 'profiles.id as profile_id')
-    //         ->orderByRaw("
-    //             CASE 
-    //                 WHEN profiles.status = 'Waiting for Approval' THEN 1 
-    //                 WHEN profiles.status = 'Not Submitted' THEN 2 
-    //                 WHEN profiles.status = 'Approved' THEN 3 
-    //                 WHEN profiles.status = 'Rejected' THEN 4 
-    //                 ELSE 5 
-    //             END
-    //         ");
-    
-    //     // ✅ Filter by Proof Status
-    //     if ($request->status && $request->status != 'all') {
-    //         if ($request->status == 'Not Submitted') {
-    //             $query->whereNull('profiles.status'); // Only users with no profile
-    //         } else {
-    //             $query->where('profiles.status', $request->status);
-    //         }
-    //     }
-    
-    //     // ✅ Search by Email
-    //     if ($request->email) {
-    //         $query->where('users.email', 'LIKE', "%{$request->email}%");
-    //     }
-    
-    //     $users = $query->paginate(1); // ✅ Adjust pagination
-
-    //     return view('user.dashboard', compact('users')); // ✅ Pass users to Blade
-    // }
-
     public function index()
-{
-    $users = User::with('profile')
-            ->where('role', 'user') // ✅ Only show users
-            ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
-            ->select('users.*', 'profiles.id_proof', 'profiles.address_proof', 'profiles.status', 'profiles.id as profile_id')
-            ->orderByRaw("
-                CASE 
-                    WHEN profiles.status = 'Waiting for Approval' THEN 1 
-                    WHEN profiles.status = 'Not Submitted' THEN 2 
-                    WHEN profiles.status = 'Approved' THEN 3 
-                    WHEN profiles.status = 'Rejected' THEN 4 
-                    ELSE 5 
-                END
-            ")->paginate(5);;
-    // $users = User::with('profile')
-    //     ->where('role', 'user')
-         // ✅ Only paginates the full user list
-
-    return view('user.dashboard', compact('users')); // ✅ Load view with users
-}
+    {
+        $users = User::with('profile')
+                ->where('role', 'user') //  Only show users
+                ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+                ->select('users.*', 'profiles.id_proof', 'profiles.address_proof', 'profiles.status', 'profiles.id as profile_id')
+                ->orderByRaw("
+                    CASE 
+                        WHEN profiles.status = 'Waiting for Approval' THEN 1 
+                        WHEN profiles.status = 'Not Submitted' THEN 2 
+                        WHEN profiles.status = 'Approved' THEN 3 
+                        WHEN profiles.status = 'Rejected' THEN 4 
+                        ELSE 5 
+                    END
+                ")->paginate(5);
+        return view('user.dashboard', compact('users'));
+    }
 
 public function filterUsers(Request $request)
 {
     $query = User::with('profile')
-        ->where('role', 'user') // ✅ Show only users
+        ->where('role', 'user') //  Show only users
         ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
         ->select('users.*', 'profiles.id_proof', 'profiles.address_proof', 'profiles.status', 'profiles.id as profile_id')
         ->orderByRaw("
@@ -89,7 +49,7 @@ public function filterUsers(Request $request)
             END
         ");
 
-    // ✅ Apply Filters
+    //  Apply Filters
     if ($request->status && $request->status != 'all') {
         if ($request->status == 'Not Submitted') {
             $query->whereNull('profiles.status'); 
@@ -98,7 +58,7 @@ public function filterUsers(Request $request)
         }
     }
 
-    // ✅ Apply Email Search
+    //  Apply Email Search
     if ($request->email) {
         $query->where('users.email', 'LIKE', "%{$request->email}%");
     }
@@ -112,7 +72,7 @@ public function filterUsers(Request $request)
 }
 
 
-    // ✅ Handle document upload & update status
+    //  Handle document upload & update status
     public function uploadProof(Request $request, $userId)
     {
         $request->validate([
@@ -131,7 +91,7 @@ public function filterUsers(Request $request)
             $profile->address_proof = $request->file('address_proof')->store('proofs', 'public');
         }
 
-        // ✅ Set status to "Waiting for Approval" if at least one document is uploaded
+        //  Set status to "Waiting for Approval" if at least one document is uploaded
         if ($request->hasFile('id_proof') || $request->hasFile('address_proof')) {
             $profile->status = 'Waiting for Approval';
         }

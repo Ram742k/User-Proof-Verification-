@@ -86,6 +86,8 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 $(document).ready(function () {
     function loadUsers(status = 'all', email = '', page = 1) {
@@ -124,7 +126,7 @@ $(document).ready(function () {
                 $("#userList").html(userList);
                 $("#paginationLinks").html(response.pagination); 
 
-                // ✅ Fix Pagination Clicks
+                // Pagination Clicks
                 $("#paginationLinks .page-link").click(function (e) {
                     e.preventDefault();
                     let page = $(this).attr("href").split("page=")[1]; 
@@ -136,13 +138,13 @@ $(document).ready(function () {
 
     
     loadUsers();
-
+    //  Load users on page load
     
     $("#applyFilters").click(function () {
         loadUsers($("#filterStatus").val(), $("#searchEmail").val());
     });
 
-    // ✅ Update proof status via AJAX
+    //  Update proof status via AJAX
     window.updateStatus = function (profileId, status) {
         $.ajax({
             url: "/admin/update-status",
