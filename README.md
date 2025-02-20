@@ -8,7 +8,7 @@ This Laravel-based application allows users to upload **ID Proofs & Address Proo
 
 ### 1️⃣ Clone the Repository
 ```sh
-git clone https://github.com/your-repository.git
+git clone https://github.com/Ram742k/User-Proof-Verification-.git
 cd your-repository
 ```
 
