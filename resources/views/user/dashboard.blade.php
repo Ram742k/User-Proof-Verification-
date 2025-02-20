@@ -288,8 +288,11 @@ $(document).ready(function () {
             data: formData,
             contentType: false,
             processData: false,
+            headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')  // ✅ CSRF Protection
+        },
             success: function (response) {
-                closeModal(userId);
+                $("#uploadModal" + userId).modal("hide");
                 alert(response.message);
                 
                 
@@ -305,7 +308,16 @@ $(document).ready(function () {
                 filterUsers(); // ✅ Refresh user list
             },
             error: function (xhr) {
-                console.log("Upload Error:", xhr.responseText);
+                if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                let errorMessages = "";
+                $.each(errors, function (key, value) {
+                    errorMessages += value[0] + "\n"; // Displaying first error for each field
+                });
+                alert("Upload Failed:\n" + errorMessages);
+            } else {
+                alert("An error occurred. Please try again.");
+            }
             }
         });
     });
